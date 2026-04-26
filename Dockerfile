@@ -11,7 +11,7 @@ COPY --from=node:22-slim /usr/local/bin/node /usr/local/bin/node
 COPY --from=node:22-slim /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/npm
 
 # Copy openclaw CLI from official image (same version as openclaw container)
-COPY --from=ghcr.io/hostinger/hvps-openclaw:latest /usr/bin/openclaw /usr/local/bin/openclaw
+COPY --from=ghcr.io/hostinger/hvps-openclaw:latest /usr/local/bin/openclaw /usr/local/bin/openclaw
 COPY --from=ghcr.io/hostinger/hvps-openclaw:latest /usr/local/lib/node_modules/openclaw /usr/local/lib/node_modules/openclaw
 
 # Install uv
