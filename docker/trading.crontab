@@ -1,0 +1,22 @@
+SHELL=/bin/bash
+PATH=/app/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Trading schedule — America/New_York timezone (weekdays only)
+# All times are ET. DST handled by TZ=America/New_York in container.
+
+# 08:45 — Pre-market check
+45 8 * * 1-5 . /etc/environment; cd /app && python scripts/run_trading.py premarket >> /app/logs/cron.log 2>&1
+
+# 09:31 to 15:45 — Live trading every 5 minutes
+*/5 10-14 * * 1-5 . /etc/environment; cd /app && python scripts/run_trading.py live >> /app/logs/cron.log 2>&1
+31-55/5 9 * * 1-5  . /etc/environment; cd /app && python scripts/run_trading.py live >> /app/logs/cron.log 2>&1
+0-45/5 15 * * 1-5  . /etc/environment; cd /app && python scripts/run_trading.py live >> /app/logs/cron.log 2>&1
+
+# 15:45 — Close all positions
+45 15 * * 1-5 . /etc/environment; cd /app && python scripts/run_trading.py close >> /app/logs/cron.log 2>&1
+
+# 17:00 — Daily report + Telegram summary
+0 17 * * 1-5 . /etc/environment; cd /app && python scripts/run_trading.py report >> /app/logs/cron.log 2>&1
+
+# Health check every 30 minutes during market hours
+*/30 9-16 * * 1-5 . /etc/environment; cd /app && python scripts/healthcheck.py >> /app/logs/healthcheck.log 2>&1

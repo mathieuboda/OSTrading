@@ -1,0 +1,25 @@
+risk:
+  position_sizing:
+    max_position_pct: 0.03
+    max_portfolio_concentration_pct: 0.15
+    sizing_method: equal_weight
+
+  daily_limits:
+    max_daily_loss_pct: 0.02
+    max_daily_trades: 10
+
+  drawdown:
+    halt_on_drawdown: true
+    halt_threshold_pct: 0.05
+    cooldown_hours: 24
+
+  market_rules:
+    market_hours_only: true
+    no_trade_pre_earnings_hours: 48
+    no_short_selling: false
+
+  order_validation:
+    min_order_value_usd: 50
+    max_order_value_usd: 5000
+    require_limit_orders: false
+    slippage_tolerance_pct: 0.005

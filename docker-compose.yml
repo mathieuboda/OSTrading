@@ -1,0 +1,64 @@
+services:
+  trading-agents:
+    build: .
+    container_name: trading-agents
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - TZ=America/New_York
+      - PYTHONPATH=/app
+      - OPENCLAW_GATEWAY_URL=http://openclaw:18789
+    depends_on:
+      openclaw:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/logs
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  openclaw:
+    image: ghcr.io/hostinger/hvps-openclaw:latest
+    init: true
+    container_name: trading-openclaw
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      OPENCLAW_DATA_DIR: /data/.openclaw
+      PORT: "47659"
+      DATABASE_URL: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongodb:27017/trading?authSource=admin
+    ports:
+      - "3003:3002"
+      - "47660:47659"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:18789').then(()=>process.exit(0)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 120s
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    volumes:
+      - ./data:/data
+
+  mongodb:
+    image: mongo:7
+    container_name: trading-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    healthcheck:
+      test: ["CMD", "mongosh", "-u", "${MONGO_USER}", "-p", "${MONGO_PASSWORD}", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - mongodb-data:/data/db
+
+volumes:
+  mongodb-data:

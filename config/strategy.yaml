@@ -1,0 +1,39 @@
+strategy:
+  name: rsi_mean_reversion
+  description: "Acheter quand le RSI est en survente avec volume anormal, vendre quand RSI sort de la zone de survente ou stop loss atteint"
+
+  entry:
+    signal: rsi_oversold
+    conditions:
+      - indicator: rsi_14
+        operator: "<"
+        value: 30
+      - indicator: volume
+        operator: ">"
+        reference: avg_volume_20d
+        multiplier: 1.5
+    action: buy
+    position_size_method: risk_agent
+
+  exit:
+    conditions:
+      - type: take_profit
+        indicator: rsi_14
+        operator: ">"
+        value: 65
+        action: sell_all
+      - type: stop_loss
+        indicator: unrealized_loss_pct
+        operator: "<"
+        value: -0.05
+        action: sell_all
+
+  filters:
+    - type: market_hours_only
+      enabled: true
+    - type: no_trade_pre_earnings
+      hours: 48
+      enabled: true
+    - type: min_price
+      value: 5.00
+      enabled: true

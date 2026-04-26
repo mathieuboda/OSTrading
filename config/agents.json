@@ -1,0 +1,36 @@
+{
+    "broker": "alpaca",
+    "paper_trading": true,
+    "data_provider": "alpaca",
+    "agents": {
+        "data": {
+            "watchlist": ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "SPY", "QQQ", "META", "TSLA", "JPM"],
+            "bar_size": "5Min",
+            "indicators": ["rsi_14", "sma_20", "sma_50", "avg_volume_20d"]
+        },
+        "strategy": {
+            "name": "rsi_mean_reversion",
+            "entry": {
+                "condition": "rsi_14 < 30 AND volume > avg_volume_20d * 1.5",
+                "action": "buy"
+            },
+            "exit": {
+                "condition": "rsi_14 > 65 OR unrealized_loss_pct < -0.05",
+                "action": "sell_all"
+            }
+        },
+        "execution": {
+            "order_type": "limit",
+            "time_in_force": "day",
+            "slippage_buffer_pct": 0.001
+        },
+        "risk": {
+            "max_position_pct": 0.03,
+            "max_daily_loss_pct": 0.02,
+            "halt_on_drawdown": true,
+            "max_portfolio_concentration_pct": 0.15,
+            "no_trade_pre_earnings_hours": 48,
+            "market_hours_only": true
+        }
+    }
+}
