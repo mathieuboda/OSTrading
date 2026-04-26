@@ -7,12 +7,13 @@ services:
     environment:
       - TZ=America/New_York
       - PYTHONPATH=/app
-      - OPENCLAW_GATEWAY_URL=http://openclaw:18789
+      - OPENCLAW_DATA_DIR=/data/.openclaw
     depends_on:
       openclaw:
         condition: service_healthy
     volumes:
       - ./logs:/app/logs
+      - ./data:/data
     logging:
       driver: "json-file"
       options:

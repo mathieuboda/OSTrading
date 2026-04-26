@@ -5,10 +5,10 @@ PATH=/app/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # All times are ET. DST handled by TZ=America/New_York in container.
 
 # 08:30 — INFO agent: pre-market analysis → writes to SIGNALS.md
-30 8 * * 1-5 . /etc/environment; openclaw agent --agent info --message "Lance l'analyse pré-marché. Recherche les news, vérifie les earnings 48h, analyse AAPL MSFT GOOGL AMZN NVDA TSLA META SPY QQQ AMD. Écris les signaux dans /data/.openclaw/workspace-shared/SIGNALS.md selon le format MEMORY.md." --timeout 120 >> /app/logs/info-agent.log 2>&1
+30 8 * * 1-5 . /etc/environment; openclaw agent --agent info --local --message "Lance l'analyse pré-marché. Recherche les news, vérifie les earnings 48h, analyse AAPL MSFT GOOGL AMZN NVDA TSLA META SPY QQQ AMD. Écris les signaux dans /data/.openclaw/workspace-shared/SIGNALS.md selon le format MEMORY.md." --timeout 120 >> /app/logs/info-agent.log 2>&1
 
 # 08:45 — TRADE agent: pre-market check + lecture des signaux INFO
-45 8 * * 1-5 . /etc/environment; cd /app && python scripts/run_trading.py premarket >> /app/logs/cron.log 2>&1 && openclaw agent --agent trade --message "Lis les signaux dans SIGNALS.md et prépare le plan de trading du jour. Notifie Mathieu via Telegram." --deliver --reply-channel telegram --timeout 60 >> /app/logs/cron.log 2>&1
+45 8 * * 1-5 . /etc/environment; cd /app && python scripts/run_trading.py premarket >> /app/logs/cron.log 2>&1 && openclaw agent --agent trade --local --message "Lis les signaux dans SIGNALS.md et prépare le plan de trading du jour. Notifie Mathieu via Telegram." --deliver --reply-channel telegram --timeout 60 >> /app/logs/cron.log 2>&1
 
 # 09:31 to 15:45 — Live trading every 5 minutes
 */5 10-14 * * 1-5 . /etc/environment; cd /app && python scripts/run_trading.py live >> /app/logs/cron.log 2>&1

@@ -6,6 +6,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     tzdata \
     && rm -rf /var/lib/apt/lists/*
 
+# Copy Node.js runtime (needed to run openclaw CLI)
+COPY --from=node:22-slim /usr/local/bin/node /usr/local/bin/node
+COPY --from=node:22-slim /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/npm
+
+# Copy openclaw CLI from official image (same version as openclaw container)
+COPY --from=ghcr.io/hostinger/hvps-openclaw:latest /usr/bin/openclaw /usr/local/bin/openclaw
+COPY --from=ghcr.io/hostinger/hvps-openclaw:latest /usr/local/lib/node_modules/openclaw /usr/local/lib/node_modules/openclaw
+
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
@@ -30,7 +38,7 @@ RUN chmod +x /entrypoint.sh
 ENV TZ=America/New_York \
     PYTHONUNBUFFERED=1 \
     PYTHONPATH=/app \
-    PATH="/app/.venv/bin:$PATH"
+    PATH="/app/.venv/bin:/usr/local/bin:$PATH"
 
 HEALTHCHECK --interval=5m --timeout=30s --retries=3 \
     CMD python scripts/healthcheck.py || exit 1
