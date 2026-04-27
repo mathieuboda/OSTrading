@@ -39,7 +39,8 @@ RUN chmod +x /entrypoint.sh
 ENV TZ=America/New_York \
     PYTHONUNBUFFERED=1 \
     PYTHONPATH=/app \
-    PATH="/app/.venv/bin:/usr/local/bin:$PATH"
+    PATH="/app/.venv/bin:/usr/local/bin:$PATH" \
+    HOME=/data
 
 HEALTHCHECK --interval=5m --timeout=30s --retries=3 \
     CMD python scripts/healthcheck.py || exit 1
