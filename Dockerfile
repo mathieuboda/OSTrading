@@ -10,9 +10,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --from=node:22-slim /usr/local/bin/node /usr/local/bin/node
 COPY --from=node:22-slim /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/npm
 
-# Copy openclaw CLI from official image (same version as openclaw container)
-COPY --from=ghcr.io/hostinger/hvps-openclaw:latest /usr/local/bin/openclaw /usr/local/bin/openclaw
+# Copy openclaw package and create proper symlink (binary must point to package dir)
 COPY --from=ghcr.io/hostinger/hvps-openclaw:latest /usr/local/lib/node_modules/openclaw /usr/local/lib/node_modules/openclaw
+RUN ln -sf /usr/local/lib/node_modules/openclaw/openclaw.mjs /usr/local/bin/openclaw \
+    && chmod +x /usr/local/lib/node_modules/openclaw/openclaw.mjs
 
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
